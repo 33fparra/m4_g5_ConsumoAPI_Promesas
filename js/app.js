@@ -1,12 +1,12 @@
 
-// Función asíncrona para obtener las categorías de recetas
+// aca esta la famosa función asíncrona para obtener las categorías de recetas
 async function obtenerCategorias() {
-  const url = 'https://www.themealdb.com/api/json/v1/1/categories.php';
+  const url = 'https://www.themealdb.com/api/json/v1/1/categories.php'; //aqui guardo la API en mi constante "url"
 
   try {
-    const response = await fetch(url);
+    const response = await fetch(url); //aqui llamo a la URL 
     const data = await response.json();
-    const categorias = data.categories;
+    const categorias = data.categories;  //guardo en categorias la data que entrega categories /si se pierden aca hagan console.log(categorias)
 
     categorias.forEach(categoria => {
       const option = document.createElement('option');
@@ -14,12 +14,13 @@ async function obtenerCategorias() {
       option.textContent = categoria.strCategory;
       selectRecetas.appendChild(option);
     });
+    //aca atrapamos el error
   } catch (error) {
     console.log('Error al obtener las categorías:', error);
   }
 }
 
-// Función asíncrona para obtener las recetas filtradas por categoría o nombre
+// esta es otra función asíncrona para obtener las recetas filtradas por categoría o nombre pero no he hecho nada en el html asi que puede que eso me este fallando
 async function obtenerRecetas(categoria, nombre) {
   let url = `https://www.themealdb.com/api/json/v1/1/filter.php?`;
   if (categoria) {
@@ -29,12 +30,12 @@ async function obtenerRecetas(categoria, nombre) {
     if (nombre) {
     url += &i=${nombre};
     }
-    
+    //aqui entra intentando ejecutar
     try {
     const response = await fetch(url);
     const data = await response.json();
     const recetas = data.meals;
-    cardContainer.innerHTML = ''; // Limpiar el contenedor de cards antes de mostrar las nuevas recetas
+    cardContainer.innerHTML = ''; 
 
 recetas.forEach(receta => {
   const card = document.createElement('div');
@@ -48,12 +49,14 @@ recetas.forEach(receta => {
   `;
   cardContainer.appendChild(card);
 });
+ // si no funciona lo atrapa el catch 
+
 } catch (error) {
   console.log('Error al obtener las recetas:', error);
   }
   }
   
-  // Evento para obtener las recetas al enviar el formulario
+  // este es el evento para obtener las recetas al enviar el formulario
   form.addEventListener('submit', e => {
   e.preventDefault();
   const categoriaSeleccionada = selectRecetas.value;
@@ -61,10 +64,10 @@ recetas.forEach(receta => {
   obtenerRecetas(categoriaSeleccionada, nombreReceta);
   });
   
-  // Evento para traer múltiples recetas
+  // este es el evento para traer múltiples recetas *(que no funciona XD revisar)
   btnMultipleRecetas.addEventListener('click', () => {
   obtenerRecetas();
   });
   
-  // Obtener las categorías al cargar la página
+  // aqui obtengo las categorías al cargar la página
   obtenerCategorias();
