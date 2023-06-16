@@ -9,9 +9,6 @@
 </head>
 <body>
 
-
-    <body>
-
     <nav class="navbar navbar-expand-lg navbar-dark bg-danger bg-gradient p-3">
         <div class="container-fluid">
             <a class="navbar-brand fs-4" href="index.html">Buscador de Recetas</a>
@@ -39,8 +36,15 @@
                 <div>
                     <label for="categorias" class="form-label">Categoría</label>
                     <select id="categorias" class="form-select">
-                        <option selected>-- Seleccione --</option>
+                        <option value="" selected>-- Seleccione --</option>
                     </select>
+                </div>
+                <div class="mt-3">
+                    <label for="searchInput" class="form-label">Buscar por nombre</label>
+                    <input type="text" id="searchInput" class="form-control" placeholder="Ingrese el nombre de la receta">
+                </div>
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-primary">Buscar</button>
                 </div>
             </form>
         </div>
