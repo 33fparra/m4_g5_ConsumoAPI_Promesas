@@ -1,132 +1,159 @@
-//requerimiento principal
+// Función para mostrar las recetas en cards
+function displayRecipes(recipes) {
+  const resultadoDiv = document.getElementById("resultado");
+  resultadoDiv.innerHTML = "";
 
-async function fetchAndDisplayCategories() {
-  const url = 'https://www.themealdb.com/api/json/v1/1/categories.php';
-//hago el intento de despliegue  
+  recipes.forEach((recipe) => {
+    const card = document.createElement("div");
+    card.classList.add("card", "col-md-4", "mb-3");
+
+    const cardBody = document.createElement("div");
+    cardBody.classList.add("card-body");
+
+    const recipeName = document.createElement("h5");
+    recipeName.classList.add("card-title");
+    recipeName.textContent = recipe.strMeal;
+
+    const recipeInstructions = document.createElement("p");
+    recipeInstructions.classList.add("card-text");
+    recipeInstructions.textContent = recipe.strInstructions;
+
+    cardBody.appendChild(recipeName);
+    cardBody.appendChild(recipeInstructions);
+    card.appendChild(cardBody);
+    resultadoDiv.appendChild(card);
+  });
+}
+
+// Función para filtrar las recetas por categoría
+function filterRecipesByCategory(category, recipes) {
+  return recipes.filter((recipe) => recipe.strCategory === category);
+}
+
+// Función para filtrar las recetas por nombre
+function filterRecipesByName(name, recipes) {
+  return recipes.filter((recipe) =>
+    recipe.strMeal.toLowerCase().includes(name.toLowerCase())
+  );
+}
+
+// Función para manejar el evento de cambio en el select de categorías
+function handleCategoryChange() {
+  const selectElement = document.getElementById("categorias");
+  const selectedCategory = selectElement.value;
+
+  if (selectedCategory === "") {
+    return; // No hacer nada si no se selecciona ninguna categoría
+  }
+
+  fetchRecipes()
+    .then((recipes) => {
+      const filteredRecipes = filterRecipesByCategory(
+        selectedCategory,
+        recipes
+      );
+      displayRecipes(filteredRecipes);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
+// Función para manejar el evento de envío del formulario
+function handleSubmit(event) {
+  event.preventDefault();
+  const searchInput = document.getElementById("searchInput");
+  const searchValue = searchInput.value.trim();
+
+  if (searchValue === "") {
+    return; // No hacer nada si no se ingresa ningún valor de búsqueda
+  }
+
+  fetchRecipes()
+    .then((recipes) => {
+      const filteredRecipes = filterRecipesByName(searchValue, recipes);
+      displayRecipes(filteredRecipes);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+
+  searchInput.value = ""; // Limpiar el campo de búsqueda después de la búsqueda
+}
+
+// Obtengo categorías desde API
+async function fetchCategories() {
+  const url = "https://www.themealdb.com/api/json/v1/1/categories.php";
+
   try {
     const response = await fetch(url);
 
     if (!response.ok) {
-      throw new Error('Error al obtener las categorías');
+      throw new Error("Error al obtener las categorías");
     }
 
     const data = await response.json();
 
-    const categories = data.categories;
+    return data.categories || [];
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+}
 
-    const selectElement = document.getElementById('categorias');
+// Obtengo recetas desde API
+async function fetchRecipes() {
+  const url = "https://www.themealdb.com/api/json/v1/1/search.php?s=";
 
-    console.log('Categorías de recetas:');
+  try {
+    const response = await fetch(url);
 
-//requerimiento opcional
-    categories.forEach((category) => {
-      console.log(category.strCategory);
-    });
+    if (!response.ok) {
+      throw new Error("Error al obtener las recetas");
+    }
+
+    const data = await response.json();
+
+    return data.meals || [];
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+}
+
+// Función para generar las opciones de select en el formulario
+function generateOptions(categories) {
+  const selectElement = document.getElementById("categorias");
+
+  categories.forEach((category) => {
+    const option = document.createElement("option");
+    option.value = category.strCategory;
+    option.textContent = category.strCategory;
+    selectElement.appendChild(option);
+  });
+}
+
+// Función principal para inicializar la aplicación
+async function initApp() {
+  try {
+    const categories = await fetchCategories();
+
+    // Ordenar las categorías (strCategory)
     categories.sort((a, b) => a.strCategory.localeCompare(b.strCategory));
 
-      console.log('Categorías de recetas ordenadas por "strCategory":');
-      categories.forEach((category) => {
-      console.log(category.strCategory);
-    });
+    generateOptions(categories);
 
-//muestro en el html
-  categories.forEach((category) => {
-      const option = document.createElement('option');
-      option.value = category.strCategory;
-      option.textContent = category.strCategory;
-      selectElement.appendChild(option);
-    });
+    // cambio al select de categorías
+    const selectElement = document.getElementById("categorias");
+    selectElement.addEventListener("change", handleCategoryChange);
 
-//atrapo el error      
+    // envío al formulario de búsqueda por nombre
+    const formElement = document.querySelector("form");
+    formElement.addEventListener("submit", handleSubmit);
   } catch (error) {
     console.error(error);
   }
 }
 
-//invoco la funcion
-fetchAndDisplayCategories();
-
-//-------------------------------------------------------------------------------------------
-
-//Aqui revisen desde aca para abajo
-
-
-// aca esta la famosa función asíncrona para obtener las categorías de recetas
-// async function obtenerCategorias() {
-//   const url = 'https://www.themealdb.com/api/json/v1/1/categories.php';
-
-//   try {
-//     const response = await fetch(url);
-//     const data = await response.json();
-//     const categorias = data.categories;
-
-//     categorias.forEach(categoria => {
-//       const option = document.createElement('option');
-//       option.value = categoria.strCategory;
-//       option.textContent = categoria.strCategory;
-//       selectRecetas.appendChild(option);
-//     });
-//     //aca atrapamos el error
-//   } catch (error) {
-//     console.log('Error al obtener las categorías:', error);
-//   }
-// }
-
-// esta es otra función asíncrona para obtener las recetas filtradas por categoría o nombre pero no he hecho nada en el html asi que puede que eso me este fallando
-// async function obtenerRecetas(categoria, nombre) {
-//   let url = 'https://www.themealdb.com/api/json/v1/1/filter.php?';
-
-//   if (categoria) {
-//     url += `c=${categoria}`;
-//   }
-
-//   if (nombre) {
-//     if (categoria) {
-//       url += '&';
-//     }
-//     url += `i=${nombre}`;
-//   }
-    //aqui entra intentando ejecutar
-  //   try {
-  //     const response = await fetch(url);
-  //     const data = await response.json();
-  //     const recetas = data.categories; // actualizamos la propiedad en función de la estructura de la respuesta
-  
-  //     cardContainer.innerHTML = '';
-  
-  //     recetas.forEach(receta => {
-  //       const card = document.createElement('div');
-  //       card.classList.add('card', 'col-md-4', 'mb-3');
-  //       card.innerHTML = `
-  //         <img src="${receta.strCategoryThumb}" class="card-img-top" alt="${receta.strCategory}">
-  //         <div class="card-body">
-  //           <h5 class="card-title">${receta.strCategory}</h5>
-  //           <p class="card-text">${receta.strCategoryDescription}</p>
-  //         </div>
-  //       `;
-  //       cardContainer.appendChild(card);
-  //     });
-  //   } catch (error) {
-  //     console.log('Error al obtener las recetas:', error);
-  //   }
-  // }
-  
-  //definimos form o si no no funciona
-  // const form = document.querySelector('#formulario');
-  // const btnMultipleRecetas = document.querySelector('#btnMultipleRecetas');
-
-  // este es el evento para obtener las recetas al enviar el formulario
-  // form.addEventListener('submit', e => {
-  //   e.preventDefault();
-  //   const categoriaSeleccionada = selectRecetas.value;
-  //   const nombreReceta = inputNombre.value;
-  //   obtenerRecetas(categoriaSeleccionada, nombreReceta);
-  // });
-  
-  // este es el evento para traer múltiples recetas *(que no funciona XD revisar)
-  // btnMultipleRecetas.addEventListener('click', () => {
-  //   obtenerRecetas();
-  // });
-  
-  // aqui obtengo las categorías al cargar la página
-  // obtenerCategorias();
+// Inicializar la aplicación al cargar la página
+initApp();
