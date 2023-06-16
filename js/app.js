@@ -1,5 +1,38 @@
 // Función para mostrar las recetas en cards
+
 function displayRecipes(recipes) {
+  const resultadoDiv = document.getElementById("resultado");
+  resultadoDiv.innerHTML = "";
+
+  recipes.forEach((recipe) => {
+    const card = document.createElement("div");
+    card.classList.add("card", "col-md-4", "mb-3");
+
+    const image = document.createElement("img");
+    image.classList.add("card-img-top");
+    image.src = recipe.strMealThumb;
+    image.alt = recipe.strMeal;
+
+    const cardBody = document.createElement("div");
+    cardBody.classList.add("card-body");
+
+    const recipeName = document.createElement("h5");
+    recipeName.classList.add("card-title");
+    recipeName.textContent = recipe.strMeal;
+
+    const recipeInstructions = document.createElement("p");
+    recipeInstructions.classList.add("card-text");
+    recipeInstructions.textContent = recipe.strInstructions;
+
+    cardBody.appendChild(recipeName);
+    cardBody.appendChild(recipeInstructions);
+    card.appendChild(image);
+    card.appendChild(cardBody);
+    resultadoDiv.appendChild(card);
+  });
+}
+
+/* function displayRecipes(recipes) {
   const resultadoDiv = document.getElementById("resultado");
   resultadoDiv.innerHTML = "";
 
@@ -23,7 +56,7 @@ function displayRecipes(recipes) {
     card.appendChild(cardBody);
     resultadoDiv.appendChild(card);
   });
-}
+} */
 
 // Función para filtrar las recetas por categoría
 function filterRecipesByCategory(category, recipes) {
